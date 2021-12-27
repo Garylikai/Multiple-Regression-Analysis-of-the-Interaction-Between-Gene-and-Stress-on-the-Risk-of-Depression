@@ -1,0 +1,142 @@
+\documentclass[11pt]{article}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{scalerel,stackengine}
+\usepackage{adjustbox}
+\usepackage{pdflscape}
+\usepackage{rotating}
+\stackMath
+\newcommand\reallywidehat[1]{%
+\savestack{\tmpbox}{\stretchto{%
+  \scaleto{%
+    \scalerel*[\widthof{\ensuremath{#1}}]{\kern-.6pt\bigwedge\kern-.6pt}%
+    {\rule[-\textheight/2]{1ex}{\textheight}}%WIDTH-LIMITED BIG WEDGE
+  }{\textheight}% 
+}{0.5ex}}%
+\stackon[1pt]{#1}{\tmpbox}%
+}
+\parskip 1ex
+\graphicspath{ {./images/}}
+\input{structure.tex} 
+
+\title{AMS 578 Spring 2021\\Multiple Regression Computing Project\\Preliminary Report}
+
+\author{
+  Kai Li\thanks{Department of Applied Mathematics and Statistics, Stony Brook University, email: \href{mailto:kai.li@stonybrook.edu}{kai.li@stonybrook.edu}}
+}
+
+\date{Stony Brook University --- \today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+Depression is one of the top five leading causes of disability and disease burden worldwide \cite{ar:caspi}. Researchers such as Caspi et al. \cite{ar:caspi} and Risch et al. \cite{ar:risch} have already conducted meta-analyses of the interaction between the serotonin transporter gene (5-HTTLPR) and stressful life events on the risk of depression using regression techniques. This multiple regression computing project aims to analyze a given synthetic dataset to fit a model using statistical software \texttt{R} given the background of related studies.
+
+There are a few steps to perform a complete regression analysis. The first step is data summarizing and cleaning. Then, since variables can be nonlinear, checking if transformations are required is a key to ensure proper analysis and conclusion. An examination of important independent variables for the model becomes the following procedure. Especially, given a lack of consensus from the background, gene-by-environment and gene-by-gene interaction require additional inspection \cite{ar:caspi, ar:risch}. It is also given that at most four-way interactions of independent variables will appear. Finally, compare and determine if regression results are viable.
+
+In this preliminary report, a summary statistics table will be provided as the first step of the analysis. Then, it is necessary to explain and use a methodology to deal with missing values if they exist in the data. Finally, a check on multicollinearity after coping with missing values enables to show if multicollinearity exists between variables. A complete model selection and analysis procedure will appear on the final report. 
+
+\section{Summary Statistics}
+To better understand and interpret a set of numerical data, it is easy to summarize the data by a few statistics representing its major characteristics, such as measures of location and dispersion \cite{bk:tamhane_dunlop}. \autoref{tab:summary} includes nine basic statistics for each variable. Note that there are 32 variables. Y is the quantitative independent variable measuring depressogenic effect; six environmental variables, denoted E1 through E6, quantify stressful life events; R1 through R25 are binary gene variables that are the candidate genes for depression from the serotonin system \cite{ar:caspi, ar:risch}. There are either 20 or 30 missing values for some of the variables in the dataset, about 1.08\% and 1.62\%, respectively, of the total observations.  Hence, an analysis of the missing data is needed.
+
+\input{summary.tex}
+
+\section{Missing Data Methodology}
+In this section, a methodology to deal with the missing data will be discussed. Before that, the pattern of the missing values needs to be identified. In general, there are three types of missing data based on the patterns of missingness. Missing completely at random (MCAR) is defined as when the data missing probability is the same for all cases; missing at random (MAR) is defined as when the data missing probability is the same within the observed data alone; missing not at random (MNAR) is defined to be the data which is not MCAR or MAR \cite{bk:buuren, bk:rao}. There are available tools to visualize missing pattern. One is called the missing value specification plot, shown in \autoref{fig:vis_miss}. No systematic pattern of the missing values is observed from the plot. That is, the plot describes a general pattern with no specific structure, and hence the MCAR/MAR assumption is more likely to be true. Hypothesis testing can also be used to check for associations between missing and observed data. The null hypothesis is that the missing data is MCAR/MAR, versus the alternative hypothesis that it is MNAR. As shown in \autoref{tab:missing}, at the 0.01 level of significance, the test result is not significant, with Y being the dependent variable, environmental and gene as independent variables. In this project, the missing data will be considered MAR instead of MCAR because, for robustness, MCAR is an ideal but unreasonable assumption \cite{ar:kang}.
+
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[scale=0.69]{vis_miss}
+\end{center}
+\caption{Missing Value Specification Plot}
+\label{fig:vis_miss}
+\end{figure}
+
+After diagnosing the missing value pattern, it is appropriate to find a solution to deal with them. In many existing fields, multiple imputation is now accepted as the best general method to deal with datasets with missing values \cite{bk:buuren}. One significant advantage of multiple imputation, as opposed to single imputation, is that it preserves the natural variability of the missing data and incorporates the uncertainty due to the nature of MAR, which enables to perform a valid statistical inference \cite{ar:kang}. For this project, multivariate imputation by chained equations (MICE), a particular type of multiple imputation method, will be selected to impute the missing data. Because the dataset contains both continuous and binary variables, the chained equations approach is utilized due to its flexibility with variable types \cite{ar:azur}.
+
+A package in \texttt{R} called \texttt{mice} corresponds directly to MICE techniques. The number of imputations created and the number of iterations for each imputation should be considered to use the method properly. Buuren \cite{bk:buuren} mentions that multiple imputation can generate unbiased estimates and correct confidence intervals with the number of imputed datasets as small as two. Raghunathan et al. \cite{bk:raghunathan} suggest 10 iterations per imputation. Given the size of the dataset, the amount of missing information, and the available computer resources, two imputed datasets and ten iterations for each will be outputted in this report \cite{ar:azur}.
+
+
+\section{Multicollinearity Diagnostics}
+Multiple regression models are used for a wide variety of applications. One common serious issue in regression analysis that may lead to a considerable decrease in the usefulness of a model is multicollinearity or near-linear dependence among regression variables \cite{bk:montgomery}. Currently, there are techniques for detecting multicollinearity. 
+
+One informal measure of multicollinearity is the examination of the correlation matrix. Large coefficients of simple correlation coefficients between pairs of independent variables indicate a presence of serious multicollinearity \cite{bk:kutner}. That is, if the absolute value of a non-diagonal element, also called pairwise correlation, is close to 1, a nearly linearly dependent relationship between regressors is detected \cite{bk:montgomery}. The correlation matrices for the two imputed datasets are shown in \hyperref[tab:cormat1]{Tables 3} and \hyperref[tab:cormat2]{4}. All non-diagonal absolute pairwise correlation coefficients are less than or equal to 0.07, suggesting that the variables are not nearly linearly dependent.
+
+Montgomery et al. \cite{bk:montgomery} also claim that when more than two independent variables are involved in a near-linear dependence relationship, it is not guaranteed that any of the pairwise correlations will be large. Thus, a formal way to diagnose multicollinearity is using variance inflation factor (VIF). If the largest VIF value among the regressors exceeds 10, it indicates multicollinearity, which can unduly influence model estimates \cite{bk:kutner}. The maximum VIFs in both datasets are 1.025 and 1.026, respectively, which suggests no multicollinearity issue in both imputed datasets.
+
+
+\appendix
+\section{Technical Implementation in \texttt{R}}
+In the technical appendix, code implementation will be provided to show how results are obtained. At the beginning of the project, three files containing the unmerged datasets with variables \texttt{ID}, \texttt{Y}, \texttt{E}, and \texttt{R} are provided. The initial dataset is generated by combining the three files based on variable \texttt{ID}. Function \texttt{merge()} in \texttt{R} will work. Because there are numerous existing software/methods to merge datasets, the code for merging is omitted. The focus is the implementation of the combined data. The combined data is named variable \texttt{data} in the code below.
+
+\subsection{Summary Statistics}
+\autoref{tab:summary} is created using package \texttt{reporttools}, which directly outputs the summary statistics table in \LaTeX. Parts of summary statistics are omitted for simplicity purposes. 
+\begin{file}[project.r]
+\begin{lstlisting}[language = R]
+library(reporttools)
+vars0 <- with(data, data.frame(data[, -1]))
+tableContinuous(vars = vars0, prec = 2, longtable = FALSE)
+\end{lstlisting}
+\end{file}
+
+\subsection{Missing Value Specification Plot}
+\autoref{fig:vis_miss} is a plot generated by package \texttt{naniar}. It provides functions to facilitate the plottings of missing values. \texttt{vis\_miss()} returns the missing value specification plot.
+\begin{file}[project.r]
+\begin{lstlisting}[language = R]
+library(naniar)
+vis_miss(data)
+\end{lstlisting}
+\end{file}
+
+\subsection{Missing Data Pattern Analysis}
+\texttt{finalfit} includes functions to ensure missing data is correctly identified. \texttt{missing\_compare()} performs the hypothesis testing of whether the missing data follows an MCAR/MAR or MNAR by comparing missing data in the dependent variable across explanatory variables. \autoref{tab:missing} shows the p-values in the return output. 
+\begin{file}[project.r]
+\begin{lstlisting}[language = R]
+library(finalfit)
+missing_compare(data, "Y", colnames(data)[-1])
+\end{lstlisting}
+\end{file}
+
+\input{missing.tex}
+
+\subsection{Multiple Imputation}
+Package \texttt{mice}, written by Karin Groothuis-Oudshoorn and Van Buuren, can perform multiple imputation computations \cite{bk:buuren}. The imputation method selected for each dataset is classification and regression trees (CART). Function \texttt{mice()} generates multiple imputation datasets, and function \texttt{complete()} returns the complete data in a specified format. After that, each complete dataset is ready to perform analysis. 
+\begin{file}[project.r]
+\begin{lstlisting}[language = R]
+library(mice)
+imp <- mice(data, method = "cart", m = 2, maxit = 10,
+            seed = 123, print = FALSE)
+data1 <- complete(imp, 1)
+data2 <- complete(imp, 2)
+\end{lstlisting}
+\end{file}
+
+\subsection{Multicollinearity Diagnostics}
+Correlation matrices in \hyperref[tab:cormat1]{Tables 3} and \hyperref[tab:cormat2]{4} can be obtained using function \texttt{cor()}. The correlation coefficients are rounded to 2 decimals to reduce the unnecessary digits. VIFs can be calculated under package \texttt{car} for linear models. Function \texttt{vif()} outputs VIF values for all variables in linear regression model \texttt{lm()}. Because only the maximums are considered, return using function \texttt{max()} is sufficient.
+
+\setcounter{MaxMatrixCols}{32}
+\begin{landscape}
+\input{cormat1.tex}
+\input{cormat2.tex}
+\restoregeometry
+\end{landscape}
+
+
+\begin{file}[project.r]
+\begin{lstlisting}[language = R]
+cor_mat1 <- round(cor(data1[-1, -1]), 2)
+cor_mat2 <- round(cor(data2[-1, -1]), 2)
+
+library(car)
+max(vif(lm(Y ~ ., data = data1)))
+max(vif(lm(Y ~ ., data = data2)))
+\end{lstlisting}
+\end{file}
+
+\bibliographystyle{abbrv}
+\bibliography{refs}
+
+\end{document}
