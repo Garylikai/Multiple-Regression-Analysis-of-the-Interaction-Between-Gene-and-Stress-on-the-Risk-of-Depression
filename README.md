@@ -5,6 +5,7 @@ Final Report. May 3, 2021
 
 Preliminary Report. April 19, 2021
 
+- Descriptions in a `pdf` file
 - Datasets in `csv` format
 - Preliminary and final reports in `pdf` files
 - R code implementation in `r` format
