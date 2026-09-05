@@ -1,8 +1,8 @@
-dataY <- read.csv("D:/Course/SP21/AMS 578/Project/IDYgroup358694.csv")
+dataY <- read.csv("IDYgroup.csv")
 dataY <- dataY[,-1]
-dataE <- read.csv("D:/Course/SP21/AMS 578/Project/IDEgroup358694.csv")
+dataE <- read.csv("IDEgroup.csv")
 dataE <- dataE[,-1]
-dataG <- read.csv("D:/Course/SP21/AMS 578/Project/IDGgroup358694.csv")
+dataG <- read.csv("IDGgroup.csv")
 dataG <- dataG[,-1]
 data <- merge(merge(dataY, dataE, by = "ID"), dataG, by = "ID")
 data <- data[,-1]
