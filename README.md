@@ -17,7 +17,7 @@ In the selected pooled model, several genetic and stress-related variables and p
 ## Repository contents
 
 - `analysis.R` — complete R analysis
-- `IDEgroup358694.csv`, `IDGgroup358694.csv`, and `IDYgroup358694.csv` — analysis inputs
+- `IDEgroup.csv`, `IDGgroup.csv`, and `IDYgroup.csv` — analysis inputs
 - `final.pdf` — final report
 
 ## Author
