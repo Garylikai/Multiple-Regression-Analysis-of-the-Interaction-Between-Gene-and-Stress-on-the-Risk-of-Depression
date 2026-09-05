@@ -1,11 +1,25 @@
-# Multiple-Regression-Analysis-of-the-Interaction-Between-Gene-and-Stress-on-the-Risk-of-Depression
-AMS 578: Regression Theory, Spring 2021
+# Regression Analysis of Gene and Stress Variables in Synthetic Depression Data
 
-Final Report. May 3, 2021
+An AMS 578 project from Spring 2021 applying multiple-regression diagnostics, multiple imputation, transformation, model selection, and interaction analysis to a **synthetic** dataset motivated by research on depression.
 
-Preliminary Report. April 19, 2021
+## Project overview
 
-- Descriptions in a `pdf` file
-- Datasets in `csv` format
-- Preliminary and final reports in `pdf` files
-- R code implementation in `r` format
+The workflow:
+
+- summarizes and cleans three provided data files;
+- uses classification-and-regression-tree imputation through `mice` to construct two completed datasets;
+- examines regression assumptions and applies a response transformation;
+- uses BIC-based stepwise selection and model-comparison criteria; and
+- evaluates main effects, gene-by-gene interactions, and gene-by-environment interactions before pooling estimates.
+
+In the selected pooled model, several genetic and stress-related variables and pairwise gene interactions were retained. No gene-by-environment interaction was retained. Because the data are synthetic and the analysis is a course exercise, the results have no clinical, diagnostic, or causal interpretation.
+
+## Repository contents
+
+- `analysis.R` — complete R analysis
+- `IDEgroup358694.csv`, `IDGgroup358694.csv`, and `IDYgroup358694.csv` — analysis inputs
+- `final.pdf` — final report
+
+## Author
+
+Kai Li.
